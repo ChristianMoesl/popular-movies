@@ -1,3 +1,21 @@
 <resources>
+    <!-- App defintions -->
     <string name="app_name">Popular Movies</string>
+
+    <!-- General purpose string resources -->
+    <string name="release_date">Release date:\u0020</string>
+    <string name="unknown">unknown</string>
+    <string name="user_rating">User rating:\u0020</string>
+
+    <!-- Movie selection string definitions-->
+    <string name="most_popular">Most popular</string>
+    <string name="highest_rated">Highest-rated</string>
+
+    <string-array name="movie_sort_types">
+        <item>@string/most_popular</item>
+        <item>@string/highest_rated</item>
+    </string-array>
+
+    <!-- The movie db api key needed to access the web service -->
+    <string name="the_movie_db_api_key">0c172f2ca16cdd51a9edecebcff7d693</string>
 </resources>

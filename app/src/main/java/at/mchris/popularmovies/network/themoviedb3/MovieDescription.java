@@ -1,11 +1,13 @@
-package at.mchris.popularmovies.network;
+package at.mchris.popularmovies.network.themoviedb3;
+
 
 import java.util.List;
 
 /**
- * Created by chris_000 on 16.07.2016.
+ * Simple POD object which holds all the
+ * movie info needed.
  */
-public class Movie {
+public class MovieDescription {
     public String posterPath;
     public boolean adult;
     public String overview;
@@ -20,4 +22,8 @@ public class Movie {
     public int voteCount;
     public boolean video;
     public float voteAverage;
+
+    public boolean hasPoster() {
+        return posterPath != null;
+    }
 }

@@ -1,77 +1,143 @@
 package at.mchris.popularmovies;
 
-import android.os.AsyncTask;
+import android.databinding.DataBindingUtil;
+import android.net.Uri;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.GridView;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import at.mchris.popularmovies.databinding.ActivityMainBinding;
+import at.mchris.popularmovies.network.themoviedb3.*;
 
-import org.apache.http.params.HttpParams;
+public class MainActivity extends AppCompatActivity
+        implements OverviewFragment.OnMovieSelectedListener,
+                    FragmentManager.OnBackStackChangedListener {
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
-import at.mchris.popularmovies.network.HttpJsonQuery;
-import at.mchris.popularmovies.network.Movie;
-import at.mchris.popularmovies.network.PopularMoviesAnswer;
+    private ActivityMainBinding binding;
+    private String movieSelectionType;
 
-public class MainActivity extends AppCompatActivity {
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        movieSelectionType = savedInstanceState.getString(null);
+        super.onSaveInstanceState(savedInstanceState);
+    }
 
-    private static final String TAG = "MainActivity";
-
-    private ArrayAdapter<String> adapter;
-    private String[] testData = new String[]{
-            "First item",
-            "Second item"
-    };
-
-    private static final String POPULAR_MOVIES = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc";
-    private static final String API_KEY = "api_key=0c172f2ca16cdd51a9edecebcff7d693";
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        savedInstanceState.putString(null, movieSelectionType);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        adapter = new ArrayAdapter<>(getBaseContext(),
-                R.layout.grid_item_movie,
-                testData);
+        final ArrayAdapter<CharSequence> sortTypeAdapter = ArrayAdapter.createFromResource(this,
+                R.array.movie_sort_types, android.R.layout.simple_spinner_item);
+        sortTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        GridView grid = (GridView) findViewById(R.id.grid_view_movies);
-        grid.setAdapter(adapter);
+        binding.spinnerToolbarMain.setOnItemSelectedListener(onItemSelected);
+        binding.spinnerToolbarMain.setAdapter(sortTypeAdapter);
+        movieSelectionType = (String)sortTypeAdapter.getItem(0);
 
-        Query q = new Query();
-        try {
-            q.execute();
-        } catch (Exception e) {
-            Log.e(TAG, e.toString());
+        setSupportActionBar(binding.toolbarMain);
+
+        FragmentManager fm = getSupportFragmentManager();
+        fm.addOnBackStackChangedListener(this);
+
+        if (savedInstanceState == null) {
+            fm.beginTransaction()
+                    .add(R.id.activity_main_fragment, OverviewFragment.newInstance())
+                    .commit();
+
         }
+
+        // Update the home button visibility.
+        onBackStackChanged();
     }
 
-    private class Query extends AsyncTask<Void, Void, String> {
+    @Override
+    public void onMovieSelected(Uri uri) {
+        FragmentManager fm = getSupportFragmentManager();
+        fm.beginTransaction()
+                .setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
+                .add(R.id.activity_main_fragment, DetailFragment.newInstance(uri))
+                .addToBackStack(null)
+                .commit();
+    }
 
+    private final AdapterView.OnItemSelectedListener onItemSelected
+            = new AdapterView.OnItemSelectedListener() {
         @Override
-        protected String doInBackground(Void... voids) {
-            PopularMoviesAnswer pop = new HttpJsonQuery<>(
-                    POPULAR_MOVIES + "&" + API_KEY,
-                    PopularMoviesAnswer.class).execute();
+        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
-            Log.i(TAG, pop.toString());
+            String selected = (String) binding.spinnerToolbarMain.getSelectedItem();
 
-            for (Movie movie : pop.results) {
-                Log.i(TAG, "Movie " + movie.title);
+            if (!movieSelectionType.equals(selected)) {
+                movieSelectionType = selected;
+
+                Fragment fragment =
+                        getSupportFragmentManager().findFragmentById(R.id.activity_main_fragment);
+
+                if (fragment instanceof OverviewFragment) {
+                    OverviewFragment overview = (OverviewFragment)fragment;
+                    overview.setMovieSetType(movieSelectionType);
+                }
             }
+        }
+        @Override
+        public void onNothingSelected(AdapterView<?> adapterView) { }
+    };
 
-            return null;
+    private DiscoverOption convertFromSpinnerText(String text) {
+        if (getString(R.string.most_popular).equals(text)) {
+            return DiscoverOption.POPULAR;
+        } else if (getString(R.string.highest_rated).equals(text)) {
+            return DiscoverOption.VOTE_AVERAGE;
+        }
+        throw new IllegalArgumentException("text is not a discovery option");
+    }
+
+    @Override
+    @SuppressWarnings("ConstantConditions")
+    public void onBackStackChanged() {
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        } else {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        }
+        onForegroundFragmentChanged();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                onForegroundFragmentChanged();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    // TODO: Check if this is called multiple times...
+    private void onForegroundFragmentChanged() {
+
+        final Fragment fragment = getSupportFragmentManager()
+                .findFragmentById(R.id.activity_main_fragment);
+
+        if (fragment instanceof OverviewFragment) {
+            binding.spinnerToolbarMain.setVisibility(View.VISIBLE);
+        } else if  (fragment instanceof  DetailFragment) {
+            binding.spinnerToolbarMain.setVisibility(View.GONE);
         }
     }
 }
