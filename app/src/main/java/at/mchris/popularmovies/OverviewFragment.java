@@ -37,7 +37,7 @@ import at.mchris.popularmovies.network.themoviedb3.MovieTopListRequest;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link OverviewFragment.OnFragmentInteractionListener} interface
+ * {@link OverviewFragment.OnMovieSelectedListener} interface
  * to handle interaction events.
  * Use the {@link OverviewFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -188,6 +188,8 @@ public class OverviewFragment extends Fragment {
         throw new IllegalArgumentException("text is not a discovery option");
     }
 
+
+
     private void fetchConfiguration() {
         requestQueue.add(new ConfigurationRequest(
                 getString(R.string.the_movie_db_api_key),
@@ -227,6 +229,9 @@ public class OverviewFragment extends Fragment {
         }
     }
 
+    /**
+     *
+     */
     private final Response.Listener<MovieTopListAnswer> onMoviesReceived =
             new Response.Listener<MovieTopListAnswer>() {
         @Override

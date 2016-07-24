@@ -3,6 +3,7 @@ package at.mchris.popularmovies.data;
 import android.content.Context;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
+import android.support.annotation.Nullable;
 
 import at.mchris.popularmovies.R;
 import at.mchris.popularmovies.network.themoviedb3.*;
@@ -21,24 +22,29 @@ public class Movie {
     public final ObservableField<String> releaseDate = new ObservableField<>();
 
     private final Context context;
+
     private boolean isIdValid = false;
+
     private long id;
+
+    @Nullable
     private final String posterPath;
+
     private final at.mchris.popularmovies.data.Configuration configuration;
 
     public static Movie createFromDescription(Context context, MovieDescription movieDescription,
                                               at.mchris.popularmovies.data.Configuration configuration) {
         return new Movie(context,
-                        movieDescription.title,
-                        movieDescription.overview,
-                        movieDescription.voteAverage,
-                        movieDescription.releaseDate,
-                        movieDescription.posterPath,
+                        movieDescription.getTitle(),
+                        movieDescription.getOverview(),
+                        movieDescription.getVoteAverage(),
+                        movieDescription.getReleaseDate(),
+                        movieDescription.getPosterPath(),
                         configuration);
     }
 
     public Movie(Context context, String title, String overview, float voteAverage,
-                 String releaseDate, String posterPath,
+                 @Nullable String releaseDate, @Nullable String posterPath,
                  at.mchris.popularmovies.data.Configuration configuration) {
         this.context = context;
         this.posterPath = posterPath;
