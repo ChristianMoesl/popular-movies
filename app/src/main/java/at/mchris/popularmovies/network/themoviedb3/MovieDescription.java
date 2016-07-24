@@ -6,8 +6,7 @@ import android.support.annotation.Nullable;
 import java.util.List;
 
 /**
- * Simple POD object which holds all the
- * movie info needed.
+ * Represents the whole description of a movie from the movie db webservice.
  */
 public class MovieDescription {
 

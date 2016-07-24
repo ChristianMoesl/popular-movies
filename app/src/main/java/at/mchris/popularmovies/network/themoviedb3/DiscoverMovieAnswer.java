@@ -11,7 +11,19 @@ public class DiscoverMovieAnswer {
     private int totalResults;
     private int totalPages;
 
+    public int getPage() {
+        return page;
+    }
+
     public List<MovieDescription> getMovieDescriptions() {
         return results;
+    }
+
+    public int getTotalResults() {
+        return totalResults;
+    }
+
+    public int getTotalPages() {
+        return totalPages;
     }
 }

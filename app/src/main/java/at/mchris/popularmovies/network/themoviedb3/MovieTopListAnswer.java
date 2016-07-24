@@ -1,9 +1,8 @@
 package at.mchris.popularmovies.network.themoviedb3;
 
 /**
- * Created by chris_000 on 22.07.2016.
+ * The answer off a {@link MovieTopListRequest}.
  */
 public class MovieTopListAnswer extends DiscoverMovieAnswer {
-
 }
 

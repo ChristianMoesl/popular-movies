@@ -20,7 +20,35 @@ public class Configuration {
     private Images images;
     private List<String> changeKeys;
 
-    public String getBaseUrl() { return images.baseUrl; }
-    public String getSecureBaseUrl() { return images.secureBaseUrl; }
-    public List<String> getPosterSizes() { return images.posterSizes; }
+    public String getBaseUrl() {
+        return images.baseUrl;
+    }
+
+    public String getSecureBaseUrl() {
+        return images.secureBaseUrl;
+    }
+
+    public List<String> getBackdropSizes() {
+        return images.backdropSizes;
+    }
+
+    public List<String> getLogoSizes() {
+        return images.logoSizes;
+    }
+
+    public List<String> getPosterSizes() {
+        return images.posterSizes;
+    }
+
+    public List<String> getProfileSizes() {
+        return images.profileSizes;
+    }
+
+    public List<String> getStillSizes() {
+        return images.stillSizes;
+    }
+
+    public List<String> getChangeKeys() {
+        return changeKeys;
+    }
 }

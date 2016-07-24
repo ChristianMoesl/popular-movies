@@ -10,57 +10,34 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 
 /**
- * Created by chris_000 on 19.07.2016.
+ * Contains all utils for basic network access with the volley framework.
  */
 public class NetworkUtils {
 
-    private static NetworkUtils instance;
-    private RequestQueue requestQueue;
-    private ImageLoader imageLoader;
-    private static Context context;
+    private static volatile NetworkUtils instance;
+
+    private final RequestQueue requestQueue;
 
     private NetworkUtils(Context context) {
-        NetworkUtils.context = context;
-        requestQueue = getRequestQueue();
-
-        imageLoader = new ImageLoader(requestQueue,
-                new ImageLoader.ImageCache() {
-                    private final LruCache<String, Bitmap>
-                            cache = new LruCache<>(40);
-
-                    @Override
-                    public Bitmap getBitmap(String url) {
-                        return cache.get(url);
-                    }
-
-                    @Override
-                    public void putBitmap(String url, Bitmap bitmap) {
-                        cache.put(url, bitmap);
-                    }
-                });
+        requestQueue = Volley.newRequestQueue(context.getApplicationContext());
     }
 
-    public static synchronized NetworkUtils getInstance(Context context) {
+    public static NetworkUtils getInstance(Context context) {
         if (instance == null) {
-            instance = new NetworkUtils(context);
+            synchronized (NetworkUtils.class) {
+                if (instance == null) {
+                    instance = new NetworkUtils(context);
+                }
+            }
         }
         return instance;
     }
 
     public RequestQueue getRequestQueue() {
-        if (requestQueue == null) {
-            // getApplicationContext() is key, it keeps you from leaking the
-            // Activity or BroadcastReceiver if someone passes one in.
-            requestQueue = Volley.newRequestQueue(context.getApplicationContext());
-        }
         return requestQueue;
     }
 
     public <T> void addToRequestQueue(Request<T> req) {
-        getRequestQueue().add(req);
-    }
-
-    public ImageLoader getImageLoader() {
-        return imageLoader;
+         getRequestQueue().add(req);
     }
 }

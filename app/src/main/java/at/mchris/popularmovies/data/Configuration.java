@@ -5,7 +5,7 @@ import java.util.List;
 import at.mchris.popularmovies.network.themoviedb3.Info;
 
 /**
- * Created by chris_000 on 18.07.2016.
+ * A configuration object used by the movie view model.
  */
 public class Configuration {
 

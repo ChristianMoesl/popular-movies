@@ -10,7 +10,7 @@ import java.io.Closeable;
 import static at.mchris.popularmovies.data.MovieContract.*;
 
 /**
- * Created by chris_000 on 18.07.2016.
+ * The helper to access the movie db SQLite database.
  */
 public class MovieDbHelper extends SQLiteOpenHelper implements Closeable {
 

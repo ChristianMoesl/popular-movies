@@ -23,6 +23,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+
                 <android.support.v7.widget.AppCompatSpinner
                     android:id="@+id/spinner_toolbar_main"
                     android:layout_width="wrap_content"
@@ -30,6 +31,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true">
                 </android.support.v7.widget.AppCompatSpinner>
+
             </RelativeLayout>
 
         </android.support.v7.widget.Toolbar>

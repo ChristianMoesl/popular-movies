@@ -3,7 +3,7 @@ package at.mchris.popularmovies.network.themoviedb3;
 import com.android.volley.Response;
 
 /**
- * Created by chris_000 on 22.07.2016.
+ * A request to query typical movie top lists ({@link MovieTopList}).
  */
 public class MovieTopListRequest extends MovieDbRequest<MovieTopListAnswer> {
 

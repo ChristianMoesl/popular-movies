@@ -4,6 +4,7 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -15,7 +16,6 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ArrayAdapter;
 
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 
 import java.util.List;
@@ -26,7 +26,6 @@ import at.mchris.popularmovies.data.MovieContract;
 import at.mchris.popularmovies.databinding.FragmentOverviewBinding;
 import at.mchris.popularmovies.network.themoviedb3.Configuration;
 import at.mchris.popularmovies.network.themoviedb3.ConfigurationRequest;
-import at.mchris.popularmovies.network.themoviedb3.DiscoverOption;
 import at.mchris.popularmovies.network.themoviedb3.Info;
 import at.mchris.popularmovies.network.themoviedb3.MovieDescription;
 import at.mchris.popularmovies.network.themoviedb3.MovieTopList;
@@ -51,17 +50,56 @@ public class OverviewFragment extends Fragment {
         void onMovieSelected(Uri movieUri);
     }
 
+    /**
+     * A tag used for logging purpose.
+     */
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
+
+    /**
+     * The number of columns with movie images.
+     */
     private static final int NUMBER_OF_COLUMNS = 2;
+
+    /**
+     * The amount of cached movie views in the recycler view.
+     */
     private static final int ITEM_VIEW_CACHE = 20;
 
+    /**
+     * The data binding instance for this fragment.
+     */
     private FragmentOverviewBinding binding;
+
+    /**
+     * The adapter which holds all movies and movie views.
+     */
     private MovieAdapter movieAdapter;
+
+    /**
+     * A reference to the parent activity, which has to implement
+     * {@link OverviewFragment.OnMovieSelectedListener}.
+     */
     private OnMovieSelectedListener movieSelectedListener;
 
-    private RequestQueue requestQueue;
-    private String movieSelectionType;
+    /**
+     * A instance of the network utils to start simple HTTP requests.
+     */
+    private NetworkUtils network;
+
+    /**
+     * The current selected movie top list.
+     */
+    private String movieTopList;
+
+    /**
+     * The movie db configuration used to build image URLs.
+     */
+    @Nullable
     private at.mchris.popularmovies.data.Configuration configuration;
+
+    /**
+     * Determines if the initial setup is done.
+     */
     private boolean isInitialSetupDone = false;
 
     public OverviewFragment() { }
@@ -72,26 +110,47 @@ public class OverviewFragment extends Fragment {
      *
      * @return A new instance of fragment OverviewFragment.
      */
-    public static OverviewFragment newInstance() {
+    public static OverviewFragment newInstance(String movieSelectionType) {
         OverviewFragment fragment = new OverviewFragment();
         Bundle args = new Bundle();
+        args.putString(null, movieSelectionType);
         fragment.setArguments(args);
         return fragment;
     }
 
+    /**
+     * Restores all persistent state of this fragment.
+     *
+     * @param savedInstanceState The saved state to be restored.
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            movieTopList = getArguments().getString(null);
+        }
+    }
+
+    /**
+     * Creates all views and the data binding for this fragment.
+     *
+     * @param inflater The layout inflater, which should be used.
+     * @param container The container, where this fragment is embedded in.
+     * @param savedInstanceState The persistent state of this fragment.
+     * @return The created view to display.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_overview, container, false);
 
-        requestQueue = NetworkUtils.getInstance(this.getActivity().getApplicationContext())
-                .getRequestQueue();
+        network = NetworkUtils.getInstance(getContext());
 
-        movieSelectionType = getString(R.string.most_popular);
-
+        // Setup the adapter for the recycler view to display all the movies.
         movieAdapter = new MovieAdapter(this.getContext());
         movieAdapter.setOnItemClickListener(onMovieClickedListener);
 
+        // Setup the recycler view for all the thumbnails to display.
         binding.recyclerMovies.setLayoutManager(new GridLayoutManager(this.getContext(), NUMBER_OF_COLUMNS));
         binding.recyclerMovies.setAdapter(movieAdapter);
         binding.recyclerMovies.setItemAnimator(new DefaultItemAnimator());
@@ -113,6 +172,11 @@ public class OverviewFragment extends Fragment {
         return binding.getRoot();
     }
 
+    /**
+     * Checks if the activity is compatible and saves a interface reference.
+     *
+     * @param context The activity, which uses this fragment.
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -124,18 +188,35 @@ public class OverviewFragment extends Fragment {
         }
     }
 
+    /**
+     * Deletes the reference of the attached activity.
+     */
     @Override
     public void onDetach() {
         super.onDetach();
         movieSelectedListener = null;
     }
 
+    /**
+     * Sets a new movie top list.
+     *
+     * @param movieTopList The movie top list to be set.
+     */
+    public void setMovieSetType(String movieTopList) {
 
-    public void setMovieSetType(String movieSelectionType) {
-        this.movieSelectionType = movieSelectionType;
-        fetchAllMovies();
+        if (movieTopList == null) {
+            throw new IllegalArgumentException("movieTopList cannot be null.");
+        }
+
+        if (!this.movieTopList.equals(movieTopList)) {
+            this.movieTopList = movieTopList;
+            fetchAllMovies();
+        }
     }
 
+    /**
+     * Starts to fetch the images after the view is drawn.
+     */
     private final ViewTreeObserver.OnGlobalLayoutListener onFinishedDrawing =
             new ViewTreeObserver.OnGlobalLayoutListener() {
         @Override
@@ -143,7 +224,6 @@ public class OverviewFragment extends Fragment {
             if (isInitialSetupDone) {
                 return;
             }
-
             isInitialSetupDone = true;
 
             if (configuration == null || movieAdapter.getMovies().size() == 0) {
@@ -154,6 +234,9 @@ public class OverviewFragment extends Fragment {
         }
     };
 
+    /**
+     * Fetches all the movie thumbnails with the right size for the display.
+     */
     private void updatePosterSize() {
 
         final int targetWidth = binding.recyclerMovies.getLayoutManager().getWidth() / NUMBER_OF_COLUMNS;
@@ -167,6 +250,9 @@ public class OverviewFragment extends Fragment {
         movieAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Notifies the activity if a movie is clicked.
+     */
     private final MovieAdapter.OnItemClickListener onMovieClickedListener =
             new MovieAdapter.OnItemClickListener() {
         @Override
@@ -179,58 +265,56 @@ public class OverviewFragment extends Fragment {
         }
     };
 
-    private DiscoverOption convertFromSpinnerText(String text) {
-        if (getString(R.string.most_popular).equals(text)) {
-            return DiscoverOption.POPULAR;
-        } else if (getString(R.string.highest_rated).equals(text)) {
-            return DiscoverOption.VOTE_AVERAGE;
-        }
-        throw new IllegalArgumentException("text is not a discovery option");
-    }
-
-
-
+    /**
+     * Fetches the movie db configuration.
+     */
     private void fetchConfiguration() {
-        requestQueue.add(new ConfigurationRequest(
+        network.addToRequestQueue(new ConfigurationRequest(
                 getString(R.string.the_movie_db_api_key),
                 onConfigurationReceived).build());
     }
 
+    /**
+     * Saves the received movie db configuration and starts the image fetching task.
+     */
     private final Response.Listener<Configuration> onConfigurationReceived =
-            new Response.Listener<Configuration>() {
-                @Override
-                public void onResponse(Configuration response) {
+    new Response.Listener<Configuration>() {
+        @Override
+        public void onResponse(Configuration response) {
 
-                    configuration = new at.mchris.popularmovies.data.Configuration(
-                            response.getBaseUrl(), response.getPosterSizes());
-                    fetchAllMovies();
+            configuration = new at.mchris.popularmovies.data.Configuration(
+                    response.getBaseUrl(), response.getPosterSizes());
+            fetchAllMovies();
 
-                }
-            };
+        }
+    };
 
+    /**
+     * Fetches a movie top list from the movie db web service.
+     */
     private void fetchAllMovies() {
 
-        if (movieSelectionType.equals(getString(R.string.most_popular))) {
+        if (movieTopList.equals(getString(R.string.most_popular))) {
 
-            requestQueue.add(new MovieTopListRequest(
+            network.addToRequestQueue(new MovieTopListRequest(
                     getString(R.string.the_movie_db_api_key),
                     MovieTopList.POPULAR,
                     onMoviesReceived).build());
 
-        } else if (movieSelectionType.equals(getString(R.string.highest_rated))) {
+        } else if (movieTopList.equals(getString(R.string.highest_rated))) {
 
-            requestQueue.add(new MovieTopListRequest(
+            network.addToRequestQueue(new MovieTopListRequest(
                     getString(R.string.the_movie_db_api_key),
                     MovieTopList.TOP_RATED,
                     onMoviesReceived).build());
 
         } else {
-            throw new IllegalStateException("Unkown movie selection type: " + movieSelectionType);
+            throw new IllegalStateException("Unkown movie selection type: " + movieTopList);
         }
     }
 
     /**
-     *
+     * Saves all received movies and creates the corresponding view models.
      */
     private final Response.Listener<MovieTopListAnswer> onMoviesReceived =
             new Response.Listener<MovieTopListAnswer>() {

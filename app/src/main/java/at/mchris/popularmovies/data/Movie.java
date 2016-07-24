@@ -104,6 +104,7 @@ public class Movie {
                 this, scaledWidth, scaledHeight));
     }
 
+    @Nullable
     public String getPosterPath() {
         return posterPath;
     }

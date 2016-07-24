@@ -11,12 +11,10 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import org.antlr.v4.runtime.misc.NotNull;
-
 import java.io.UnsupportedEncodingException;
 
 /**
- * A Request to fetch a json object from the moviedb API.
+ * A Request to fetch a json object from the movie db API.
  */
 public class JsonRequest<T> extends com.android.volley.toolbox.JsonRequest {
 
@@ -25,6 +23,7 @@ public class JsonRequest<T> extends com.android.volley.toolbox.JsonRequest {
     private final Gson gson = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create();
+
     private final Class<T> clazz;
 
     public static JsonRequestBuilder create() {

@@ -20,19 +20,34 @@ import at.mchris.popularmovies.databinding.FragmentDetailBinding;
 
 /**
  * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link DetailFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
  * Use the {@link DetailFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class DetailFragment extends Fragment {
 
+    /**
+     * Key for uri serialization.
+     */
     private static final String MOVIE_URI_KEY = "uri";
-    private static final String LOG_TAG = DetailFragment.class.getSimpleName();
-    private static final double POSTER_SCALE_FACTOR = 1.0;
 
+    /**
+     * Tag used for logging.
+     */
+    private static final String LOG_TAG = DetailFragment.class.getSimpleName();
+
+    /**
+     * The poster quality. (A lower quality gives faster download speed)
+     */
+    private static final double POSTER_QUALITY = 1.0;
+
+    /**
+     * The uri of the movie to show.
+     */
     private Uri movieUri;
+
+    /**
+     * The data binding instance for this fragment.
+     */
     private FragmentDetailBinding binding;
 
     public DetailFragment() { }
@@ -41,7 +56,7 @@ public class DetailFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param uri The uri of the movie.
+     * @param uri The URI of the movie.
      * @return A new instance of fragment DetailFragment.
      */
     public static DetailFragment newInstance(Uri uri) {
@@ -52,6 +67,11 @@ public class DetailFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Restores all persistent state of this fragment.
+     *
+     * @param savedInstanceState The saved instance state of this fragment.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +80,14 @@ public class DetailFragment extends Fragment {
         }
     }
 
+    /**
+     * Creates all views and the data binding for this fragment.
+     *
+     * @param inflater The layout inflater, which should be used.
+     * @param container The container, where this fragment is embedded in.
+     * @param savedInstanceState The persistent state of this fragment.
+     * @return The created view to display.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -78,12 +106,18 @@ public class DetailFragment extends Fragment {
         return binding.getRoot();
     }
 
+    /**
+     * Updates the poster size and loads a image with a fitting size into the
+     * image view.
+     *
+     * @param movie The movie to be updated.
+     */
     private void updatePosterSize(Movie movie) {
         final Resources res =  getResources();
         int width = (int) res.getDimension(R.dimen.detail_activity_image_width);
         int height = (int) res.getDimension(R.dimen.detail_activity_image_height);
 
-        binding.getMovie().setPosterSize(width, height, POSTER_SCALE_FACTOR);
+        binding.getMovie().setPosterSize(width, height, POSTER_QUALITY);
 
         Picasso.with(this.getContext())
                 .load(movie.posterUrl.get())

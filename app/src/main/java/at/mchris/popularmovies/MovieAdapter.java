@@ -3,24 +3,14 @@ package at.mchris.popularmovies;
 import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
-import android.databinding.Observable;
-import android.databinding.ObservableArrayList;
-import android.databinding.ObservableList;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
-import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -67,12 +57,26 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         placeholder = new BitmapDrawable(context.getResources(), bm);
     }
 
+    /**
+     * Updates the list of movies to be displayed. "onDataSetChanged" has to be called to apply
+     * the changes.
+     *
+     * @param movies The list of movies to be set.
+     */
     public void setMovies(List<Movie> movies) {
         this.movies = movies;
     }
 
-    public List<Movie> getMovies() { return movies; }
+    /**
+     * @return The current set list of movies.
+     */
+    public List<Movie> getMovies() {
+        return movies;
+    }
 
+    /**
+     * Creates and initializes the view holder with it's data binding.
+     */
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
@@ -83,41 +87,80 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         return new MovieAdapter.ViewHolder(binding);
     }
 
+    /**
+     * @param onItemClickListener The listener to be called if an child item is clicked.
+     */
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
 
+    /**
+     * @param onItemClickListener The listener to be removed.
+     */
     public void removeOnItemClickListener(OnItemClickListener onItemClickListener) {
         if (this.onItemClickListener == onItemClickListener) {
             this.onItemClickListener = null;
         }
     }
 
+    /**
+     * Binds an existing view holder to a new movie.
+     *
+     * @param holder The view holder to be used.
+     * @param position The position of the item to bind to.
+     */
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.bindConnection(movies.get(position));
+        holder.bindMovie(movies.get(position));
     }
 
+    /**
+     * Returns the unique ID of the underlying child item.
+     *
+     * @param i The position of the child item to be used.
+     * @return The unique ID of the underlying child item.
+     */
     @Override
     public long getItemId(int i) {
         return movies.get(i).getId();
     }
 
+    /**
+     * @return The total amount of items in this movie adapter.
+     */
     @Override
     public int getItemCount() {
         return movies.size();
     }
 
+    /**
+     * Updates the poster every time when the movie poster url is changing.
+     *
+     * @param view The view to be updated.
+     * @param url The url which has changed.
+     */
     @BindingAdapter({"url"})
     public static void setUrl(ImageView view, String url) {
         ViewHolder viewHolder = (ViewHolder)view.getTag();
         viewHolder.updatePoster();
     }
 
+    /**
+     * The underlying view holder which binds to an child item.
+     */
     public class ViewHolder extends RecyclerView.ViewHolder {
 
+        /**
+         * The data binding instance, which is created once.
+         */
         private final GridItemMovieBinding binding;
 
+        /**
+         * Basic initialization of the view holder. It has to be bound to a data set
+         * for full function.
+         *
+         * @param binding The data binding instance to be used.
+         */
         public ViewHolder(GridItemMovieBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
@@ -126,11 +169,20 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
             binding.gridItemMovieImage.setTag(this);
         }
 
-        public void bindConnection(Movie movie) {
+        /**
+         * Binds a new data set to this view holder.
+         *
+         * @param movie The movie to be set.
+         */
+        public void bindMovie(Movie movie) {
             binding.setMovie(movie);
             updatePoster();
         }
 
+        /**
+         * Updates the poster image in the corresponding image view with the specified
+         * poster url.
+         */
         private void updatePoster() {
 
             Movie movie = binding.getMovie();
@@ -143,6 +195,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
                     .into(binding.gridItemMovieImage);
         }
 
+        /**
+         * Notifies an listener if a movie item is clicked.
+         */
         private final View.OnClickListener onClick = new View.OnClickListener() {
             @Override
             public void onClick(View view) {

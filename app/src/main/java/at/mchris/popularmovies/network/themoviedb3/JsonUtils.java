@@ -7,11 +7,12 @@ import com.google.gson.GsonBuilder;
 import org.json.JSONObject;
 
 /**
- * Created by chris_000 on 18.07.2016.
+ * Utils for simplified json de- serialization.
  */
 public class JsonUtils {
 
     public static <T> T fromJson(JSONObject json, Class<T> clazz) {
+
         final Gson gson = new GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .create();

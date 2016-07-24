@@ -25,32 +25,23 @@
                 <android.support.v7.widget.AppCompatImageView
                     android:id="@+id/image_view_detail"
                     android:layout_width="@dimen/detail_activity_image_width"
-                    android:layout_height="@dimen/detail_activity_image_height"/>
+                    android:layout_height="@dimen/detail_activity_image_height"
+                    android:paddingBottom="@dimen/detail_headline_padding"/>
 
                 <android.support.v7.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/detail_activity_title_size"
+                    style="@style/DetailHeadlineStyle"
                     android:text="@{movie.title}"/>
 
                 <android.support.v7.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/detail_activity_overview_size"
+                    style="@style/DetailTextStyle"
                     android:text="@{movie.overview}"/>
 
                 <android.support.v7.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
+                    style="@style/DetailTextStyle"
                     android:text="@{@string/user_rating + movie.userRating}"/>
 
                 <android.support.v7.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
+                    style="@style/DetailTextStyle"
                     android:text="@{@string/release_date + movie.releaseDate}"/>
 
             </LinearLayout>

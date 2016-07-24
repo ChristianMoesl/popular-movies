@@ -1,5 +1,7 @@
 package at.mchris.popularmovies.network.themoviedb3;
 
+import android.support.annotation.Nullable;
+
 import com.android.volley.*;
 import com.android.volley.Request;
 
@@ -11,14 +13,21 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
- * Created by chris_000 on 18.07.2016.
+ * A Builder for a simple json request setup.
+ *
+ * @param <T> The answer type of the request.
  */
 public class JsonRequestBuilder<T> {
 
     protected String path = "";
+
     protected Map<String, String> parameters = new HashMap<>();
+
     protected Response.Listener listener;
+
+    @Nullable
     protected Response.ErrorListener errorListener;
+
     protected Class<T> clazz;
 
     JsonRequestBuilder() {

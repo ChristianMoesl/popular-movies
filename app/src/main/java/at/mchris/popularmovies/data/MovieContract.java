@@ -11,7 +11,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 /**
- * Created by chris_000 on 18.07.2016.
+ * The schema for the movie database.
  */
 public class MovieContract {
 
@@ -99,8 +99,6 @@ public class MovieContract {
         SimpleDateFormat sdf = new SimpleDateFormat(from, Locale.GERMAN);
         sdf.applyLocalizedPattern(to);
         final String result = sdf.format(dateString);
-
-        Log.v("MovieContract", result);
 
         return result;
     }

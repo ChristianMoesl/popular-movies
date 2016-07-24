@@ -1,7 +1,6 @@
 package at.mchris.popularmovies.data;
 
 import android.content.ContentProvider;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
@@ -14,7 +13,7 @@ import android.support.annotation.Nullable;
 import at.mchris.popularmovies.data.MovieContract.*;
 
 /**
- * Created by chris_000 on 18.07.2016.
+ * A content provider to access the movie SQLite database.
  */
 public class MovieProvider extends ContentProvider {
 

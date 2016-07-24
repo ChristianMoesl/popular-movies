@@ -19,7 +19,7 @@ import java.util.Locale;
 import at.mchris.popularmovies.data.MovieContract.*;
 
 /**
- * Created by chris_000 on 18.07.2016.
+ * Utils for easy movie content provider access.
  */
 public class MovieContentUtils {
 

@@ -3,7 +3,9 @@ package at.mchris.popularmovies.network.themoviedb3;
 import com.android.volley.Response;
 
 /**
- * Created by chris_000 on 22.07.2016.
+ * A basic request of the movie db webservice.
+ *
+ * @param <T> The answer type of the request.
  */
 public abstract class MovieDbRequest<T> {
 
