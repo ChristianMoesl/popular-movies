@@ -44,19 +44,20 @@ import at.mchris.popularmovies.network.themoviedb3.MovieTopListRequest;
  */
 public class OverviewFragment extends Fragment {
 
+    /**
+     * Signals the parent activity, that a movie is clicked by the user.
+     */
     public interface OnMovieSelectedListener {
         void onMovieSelected(Uri movieUri);
     }
-
-    private OnMovieSelectedListener movieSelectedListener;
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final int NUMBER_OF_COLUMNS = 2;
     private static final int ITEM_VIEW_CACHE = 20;
 
-    private FragmentOverviewBinding b;
+    private FragmentOverviewBinding binding;
     private MovieAdapter movieAdapter;
-    private ArrayAdapter<CharSequence> sortTypeAdapter;
+    private OnMovieSelectedListener movieSelectedListener;
 
     private RequestQueue requestQueue;
     private String movieSelectionType;
@@ -81,7 +82,7 @@ public class OverviewFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        b = DataBindingUtil.inflate(inflater, R.layout.fragment_overview, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_overview, container, false);
 
         requestQueue = NetworkUtils.getInstance(this.getActivity().getApplicationContext())
                 .getRequestQueue();
@@ -91,12 +92,12 @@ public class OverviewFragment extends Fragment {
         movieAdapter = new MovieAdapter(this.getContext());
         movieAdapter.setOnItemClickListener(onMovieClickedListener);
 
-        b.recyclerMovies.setLayoutManager(new GridLayoutManager(this.getContext(), NUMBER_OF_COLUMNS));
-        b.recyclerMovies.setAdapter(movieAdapter);
-        b.recyclerMovies.setItemAnimator(new DefaultItemAnimator());
-        b.recyclerMovies.setItemViewCacheSize(ITEM_VIEW_CACHE);
+        binding.recyclerMovies.setLayoutManager(new GridLayoutManager(this.getContext(), NUMBER_OF_COLUMNS));
+        binding.recyclerMovies.setAdapter(movieAdapter);
+        binding.recyclerMovies.setItemAnimator(new DefaultItemAnimator());
+        binding.recyclerMovies.setItemViewCacheSize(ITEM_VIEW_CACHE);
 
-        sortTypeAdapter = ArrayAdapter.createFromResource(this.getContext(),
+        final ArrayAdapter<CharSequence> sortTypeAdapter = ArrayAdapter.createFromResource(this.getContext(),
                 R.array.movie_sort_types, android.R.layout.simple_spinner_item);
         sortTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
@@ -107,9 +108,9 @@ public class OverviewFragment extends Fragment {
             Log.e(LOG_TAG, e.getMessage());
         }
 
-        b.recyclerMovies.getViewTreeObserver().addOnGlobalLayoutListener(onFinishedDrawing);
+        binding.recyclerMovies.getViewTreeObserver().addOnGlobalLayoutListener(onFinishedDrawing);
 
-        return b.getRoot();
+        return binding.getRoot();
     }
 
     @Override
@@ -155,7 +156,7 @@ public class OverviewFragment extends Fragment {
 
     private void updatePosterSize() {
 
-        final int targetWidth = b.recyclerMovies.getLayoutManager().getWidth() / NUMBER_OF_COLUMNS;
+        final int targetWidth = binding.recyclerMovies.getLayoutManager().getWidth() / NUMBER_OF_COLUMNS;
         final int targetHeight = (int)(targetWidth * Info.POSTER_ASPECT_RATIO);
         final double quality = 0.5;
 

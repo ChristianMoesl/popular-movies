@@ -100,7 +100,7 @@ public class MovieContract {
         sdf.applyLocalizedPattern(to);
         final String result = sdf.format(dateString);
 
-        Log.i("MovieContract", result);
+        Log.v("MovieContract", result);
 
         return result;
     }

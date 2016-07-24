@@ -34,7 +34,7 @@ public class Configuration {
     public List<String> getPosterSizes() { return posterSizes; }
     public String getBaseUrl() { return baseUrl; }
 
-    public String getAppropriatePosterSize(int width, int height) {
+    private String getAppropriatePosterSize(int width, int height) {
         for (String size : posterSizes) {
             if (size.equals("original")) {
                 return size;

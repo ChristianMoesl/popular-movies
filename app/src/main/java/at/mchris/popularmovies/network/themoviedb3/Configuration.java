@@ -3,7 +3,7 @@ package at.mchris.popularmovies.network.themoviedb3;
 import java.util.List;
 
 /**
- * Simple parcelable POD object, which represents the moviedb configuration.
+ * Simple parcelable POD object, which represents "the movie db configuration".
  */
 public class Configuration {
 

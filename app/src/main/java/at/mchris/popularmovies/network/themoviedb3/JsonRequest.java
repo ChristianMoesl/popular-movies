@@ -1,5 +1,6 @@
 package at.mchris.popularmovies.network.themoviedb3;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.android.volley.NetworkResponse;
@@ -10,6 +11,8 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.antlr.v4.runtime.misc.NotNull;
+
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -18,11 +21,6 @@ import java.io.UnsupportedEncodingException;
 public class JsonRequest<T> extends com.android.volley.toolbox.JsonRequest {
 
     private static final String LOG_TAG = JsonRequest.class.getSimpleName();
-
-    @Override
-    public int compareTo(Object o) {
-        return 0;
-    }
 
     private final Gson gson = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
@@ -41,6 +39,9 @@ public class JsonRequest<T> extends com.android.volley.toolbox.JsonRequest {
 
     @Override
     protected Response<T> parseNetworkResponse(NetworkResponse response) {
+
+        Response<T> result;
+
         try {
             String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
 
@@ -51,9 +52,19 @@ public class JsonRequest<T> extends com.android.volley.toolbox.JsonRequest {
 
             T parsedObject = gson.fromJson(jsonString, clazz);
 
-            return Response.success(parsedObject, HttpHeaderParser.parseCacheHeaders(response));
+            result = Response.success(parsedObject, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException e) {
-            return Response.error(new ParseError(e));
+            result = Response.error(new ParseError(e));
         }
+
+        return result;
+    }
+
+    /**
+     * Dummy implementation for the Comparable interface, because it isn't needed-
+     */
+    @Override
+    public int compareTo(@NonNull Object o) {
+        return 0;
     }
 }

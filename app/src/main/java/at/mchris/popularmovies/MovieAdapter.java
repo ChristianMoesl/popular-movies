@@ -34,19 +34,37 @@ import at.mchris.popularmovies.databinding.GridItemMovieBinding;
  */
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
 
-    private static final BitmapDrawable drawable =
-            new BitmapDrawable(Bitmap.createBitmap(2000, 2000, Bitmap.Config.ARGB_8888));
-
+    /**
+     * A event if an child item of the movie adapter is clicked.
+     */
     public interface OnItemClickListener {
         void onItemClick(RecyclerView.Adapter<?> recyclerView, View view, int position, long id);
     }
 
+    /**
+     * A placeholder for the movie thumbnail.
+     */
+    private final BitmapDrawable placeholder;
+
+    /**
+     * The context, where this adapter lives in.
+     */
     private final Context context;
+
+    /**
+     * A list of all view models to display.
+     */
     private List<Movie> movies = new ArrayList<>();
+
+    /**
+     * The subscribed listener of the item-clicked event.
+     */
     private OnItemClickListener onItemClickListener;
 
     public MovieAdapter(Context context) {
         this.context = context;
+        final Bitmap bm = Bitmap.createBitmap(2000, 2000, Bitmap.Config.ARGB_8888);
+        placeholder = new BitmapDrawable(context.getResources(), bm);
     }
 
     public void setMovies(List<Movie> movies) {
@@ -120,7 +138,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
             Picasso.with(context.getApplicationContext())
                     .load(movie.posterUrl.get())
                     .centerCrop()
-                    .placeholder(drawable)
+                    .placeholder(placeholder)
                     .resize(movie.posterWidth.get(), movie.posterHeight.get())
                     .into(binding.gridItemMovieImage);
         }

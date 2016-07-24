@@ -114,7 +114,6 @@ public class MainActivity extends AppCompatActivity
         } else {
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
-        onForegroundFragmentChanged();
     }
 
     @Override
@@ -128,7 +127,6 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    // TODO: Check if this is called multiple times...
     private void onForegroundFragmentChanged() {
 
         final Fragment fragment = getSupportFragmentManager()

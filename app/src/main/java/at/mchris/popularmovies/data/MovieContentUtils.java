@@ -116,7 +116,7 @@ public class MovieContentUtils {
             values.put(MovieEntry.COLUMN_TITLE, movie.title.get());
             values.put(MovieEntry.COLUMN_OVERVIEW, movie.overview.get());
             values.put(MovieEntry.COLUMN_TIME_STAMP, getDateTime());
-            values.put(MovieEntry.COLUMN_RELEASE_DATE, movie.releaseDate.get());
+            values.put(MovieEntry.COLUMN_RELEASE_DATE, normalizeDate(movie.releaseDate.get()));
             values.put(MovieEntry.COLUMN_CONFIG_KEY, configId);
 
             uri = resolver.insert(MovieEntry.CONTENT_URI, values);
@@ -241,6 +241,34 @@ public class MovieContentUtils {
         return movies;
     }
 
+    private static String normalizeDate(String date) {
+
+        if (date == null) {
+            return date;
+        }
+
+        String[] t = date.split("\\.");
+        StringBuilder sb = new StringBuilder(5);
+        sb.append(t[2]).append('-');
+
+        if (t[1].length() < 2) {
+            sb.append("0" + t[1]);
+        } else {
+            sb.append(t[1]);
+        }
+
+        sb.append('-');
+
+        if (t[2].length() < 2) {
+            sb.append("0" + t[2]);
+        } else {
+            sb.append(t[2]);
+        }
+
+        Log.v("Date", "Date normalized: " + sb.toString());
+
+        return sb.toString();
+    }
 
     private static String getDateTime() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.GERMAN);

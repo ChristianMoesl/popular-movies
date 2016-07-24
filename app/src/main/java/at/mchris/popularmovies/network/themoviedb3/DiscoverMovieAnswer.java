@@ -14,5 +14,4 @@ public class DiscoverMovieAnswer {
     public List<MovieDescription> getMovieDescriptions() {
         return results;
     }
-    public int getPage() { return page; }
 }

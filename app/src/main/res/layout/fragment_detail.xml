@@ -18,8 +18,8 @@
             <LinearLayout
                 android:id="@+id/linear_layout_detail"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="@dimen/activity_vertical_margin"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/activity_margin"
                 android:orientation="vertical">
 
                 <android.support.v7.widget.AppCompatImageView
@@ -51,8 +51,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
-                    android:text="@{@string/release_date + 0
-                    movie.releaseDate}"/>
+                    android:text="@{@string/release_date + movie.releaseDate}"/>
 
             </LinearLayout>
     </ScrollView>

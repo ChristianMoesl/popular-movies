@@ -1,11 +1,14 @@
 package at.mchris.popularmovies.data;
 
 import android.content.ContentProvider;
+import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import at.mchris.popularmovies.data.MovieContract.*;
@@ -30,7 +33,7 @@ public class MovieProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 
         final int match = uriMatcher.match(uri);
         Cursor cursor;
@@ -75,7 +78,7 @@ public class MovieProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
 
         final int match = uriMatcher.match(uri);
 
@@ -93,12 +96,15 @@ public class MovieProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Uri insert(Uri uri, ContentValues contentValues) {
+    public Uri insert(@NonNull Uri uri, ContentValues contentValues) {
 
         long id;
         Uri returnUri;
 
-        try (SQLiteDatabase db = dbHelper.getWritableDatabase()) {
+        SQLiteDatabase db = null;
+        try {
+            db = dbHelper.getWritableDatabase();
+
             final int match = uriMatcher.match(uri);
 
             switch (match) {
@@ -117,17 +123,27 @@ public class MovieProvider extends ContentProvider {
                 default:
                     throw new UnsupportedOperationException("Unknown uri: " + uri);
             }
+        } finally {
+            if (db != null) {
+                db.close();
+            }
         }
-        getContext().getContentResolver().notifyChange(uri, null);
+
+        final Context context = getContext();
+        if (context != null) {
+            context.getContentResolver().notifyChange(uri, null);
+        }
         return returnUri;
     }
 
     @Override
-    public int delete(Uri uri, String whereClause, String[] whereArgs) {
+    public int delete(@NonNull Uri uri, String whereClause, String[] whereArgs) {
 
         int affectedRows = 0;
 
-        try (SQLiteDatabase db = dbHelper.getWritableDatabase()) {
+        SQLiteDatabase db = null;
+        try {
+            db = dbHelper.getWritableDatabase();
             final int match = uriMatcher.match(uri);
 
             switch (match) {
@@ -143,20 +159,28 @@ public class MovieProvider extends ContentProvider {
                 default:
                     throw new UnsupportedOperationException("Unknown uri: " + uri);
             }
+        } finally {
+            if (db != null) {
+                db.close();
+            }
         }
 
-        if (affectedRows > 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
+        final Context context = getContext();
+
+        if (affectedRows > 0 && context != null) {
+            context.getContentResolver().notifyChange(uri, null);
         }
         return affectedRows;
     }
 
     @Override
-    public int update(Uri uri, ContentValues contentValues, String whereClause, String[] whereArgs) {
+    public int update(@NonNull Uri uri, ContentValues contentValues, String whereClause, String[] whereArgs) {
 
         int affectedRows = 0;
 
-        try (SQLiteDatabase db = dbHelper.getWritableDatabase()) {
+        SQLiteDatabase db = null;
+        try {
+            db = dbHelper.getWritableDatabase();
             final int match = uriMatcher.match(uri);
 
             switch (match) {
@@ -172,8 +196,18 @@ public class MovieProvider extends ContentProvider {
                 default:
                     throw new UnsupportedOperationException("Unknown uri: " + uri);
             }
+        } finally {
+            if (db != null) {
+                db.close();
+            }
         }
-        getContext().getContentResolver().notifyChange(uri, null);
+
+        final Context context = getContext();
+
+        if (context != null) {
+            context.getContentResolver().notifyChange(uri, null);
+        }
+
         return affectedRows;
     }
 

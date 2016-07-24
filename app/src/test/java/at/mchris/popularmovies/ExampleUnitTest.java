@@ -13,6 +13,6 @@ public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() throws Exception {
         assertEquals(4, 2 + 1);
-        Log.i("Hello World", "hello");
+        Log.v("Hello World", "hello");
     }
 }

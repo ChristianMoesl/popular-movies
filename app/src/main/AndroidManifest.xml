@@ -21,8 +21,7 @@
         </activity>
         <provider
             android:authorities="at.mchris.popularmovies.data"
-            android:name=".data.MovieProvider"
-            android:exported="true"/>
+            android:name=".data.MovieProvider"/>
     </application>
 
 </manifest>
