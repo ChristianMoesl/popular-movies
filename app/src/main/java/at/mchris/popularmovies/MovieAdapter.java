@@ -5,12 +5,14 @@ import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -34,7 +36,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     /**
      * A placeholder for the movie thumbnail.
      */
-    private final BitmapDrawable placeholder;
+    private BitmapDrawable placeholder;
 
     /**
      * The context, where this adapter lives in.
@@ -53,8 +55,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
     public MovieAdapter(Context context) {
         this.context = context;
-        final Bitmap bm = Bitmap.createBitmap(2000, 2000, Bitmap.Config.ARGB_8888);
-        placeholder = new BitmapDrawable(context.getResources(), bm);
     }
 
     /**
@@ -187,12 +187,24 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
             Movie movie = binding.getMovie();
 
+            updatePlaceholder(movie.posterWidth.get(), movie.posterHeight.get());
+
             Picasso.with(context.getApplicationContext())
                     .load(movie.posterUrl.get())
                     .centerCrop()
-                    .placeholder(placeholder)
                     .resize(movie.posterWidth.get(), movie.posterHeight.get())
+                    .networkPolicy(NetworkPolicy.NO_CACHE)
+                    .placeholder(placeholder)
                     .into(binding.gridItemMovieImage);
+        }
+
+        private void updatePlaceholder(int width, int height) {
+            if (placeholder == null
+                    || placeholder.getBitmap().getWidth() != width
+                        || placeholder.getBitmap().getHeight() != height) {
+                final Bitmap bm = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                placeholder = new BitmapDrawable(context.getResources(), bm);
+            }
         }
 
         /**

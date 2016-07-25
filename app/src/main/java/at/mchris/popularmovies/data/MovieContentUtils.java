@@ -98,6 +98,8 @@ public class MovieContentUtils {
         long configId = ContentUris.parseId(uri);
         configuration.setId(configId);
 
+        Log.v(LOG_TAG, "Inserted 1 configuration");
+
         for (final String size : configuration.getPosterSizes()) {
 
             values.clear();
@@ -107,6 +109,8 @@ public class MovieContentUtils {
 
             resolver.insert(PosterSizeEntry.CONTENT_URI, values);
         }
+
+        Log.v(LOG_TAG, "Inserted " + configuration.getPosterSizes().size() + " poster sizes");
 
         for (Movie movie : movies) {
 
@@ -264,8 +268,6 @@ public class MovieContentUtils {
         } else {
             sb.append(t[2]);
         }
-
-        Log.v("Date", "Date normalized: " + sb.toString());
 
         return sb.toString();
     }

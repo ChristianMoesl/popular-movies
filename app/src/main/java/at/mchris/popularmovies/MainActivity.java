@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity
 
                 if (fragment instanceof OverviewFragment) {
                     OverviewFragment overview = (OverviewFragment)fragment;
-                    overview.setMovieSetType(movieTopList);
+                    overview.setMovieTopList(movieTopList);
                 }
             }
         }

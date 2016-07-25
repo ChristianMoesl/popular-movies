@@ -2,6 +2,7 @@ package at.mchris.popularmovies;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -160,11 +161,15 @@ public class OverviewFragment extends Fragment {
                 R.array.movie_sort_types, android.R.layout.simple_spinner_item);
         sortTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        try {
-            configuration = MovieContentUtils.getConfiguration(this.getContext());
-            movieAdapter.setMovies(MovieContentUtils.getAllMovies(this.getContext()));
-        } catch (Exception e) {
-            Log.e(LOG_TAG, e.getMessage());
+        // Fetch data from the database only if the app isn't initially started.
+        // The data has to be fetched from the network on initial app start to ensure up 2 date data.
+        if (savedInstanceState != null) {
+            try {
+                configuration = MovieContentUtils.getConfiguration(this.getContext());
+                movieAdapter.setMovies(MovieContentUtils.getAllMovies(this.getContext()));
+            } catch (Exception e) {
+                Log.v(LOG_TAG, e.getMessage());
+            }
         }
 
         binding.recyclerMovies.getViewTreeObserver().addOnGlobalLayoutListener(onFinishedDrawing);
@@ -198,18 +203,26 @@ public class OverviewFragment extends Fragment {
     }
 
     /**
-     * Sets a new movie top list.
+     * Sets a new movie top list. Triggers network requests to fetch all the
+     * data to be displayed.
      *
      * @param movieTopList The movie top list to be set.
      */
-    public void setMovieSetType(String movieTopList) {
+    public void setMovieTopList(String movieTopList) {
 
         if (movieTopList == null) {
             throw new IllegalArgumentException("movieTopList cannot be null.");
         }
 
-        if (!this.movieTopList.equals(movieTopList)) {
+        boolean movieListChanged = !this.movieTopList.equals(movieTopList);
+
+        if (movieListChanged) {
             this.movieTopList = movieTopList;
+        }
+
+        if (configuration == null || movieAdapter.getMovies().size() == 0) {
+            fetchConfiguration();
+        } else if (movieListChanged) {
             fetchAllMovies();
         }
     }
