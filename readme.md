@@ -14,3 +14,7 @@ The entry should look like this: <string name="the_movie_db_api_key">YOUR_KEY</s
 ## Used Thirdparty Libraries
 + Volley
 + Picasso
+
+## License
+
+The contents of this repository are covered under the [MIT License](LICENSE)
